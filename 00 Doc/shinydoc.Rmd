@@ -1,0 +1,9 @@
+---
+title: "Causes of Death in France and New York"
+author: "Charles Martinez (cmm5627), Happy Situ (hys82), Jenna Webb (jnw653)"
+date: "October 14, 2015"
+output: html_document
+---
+
+
+
