@@ -8,20 +8,18 @@ require(shinydashboard)
 require(leaflet)
 require(DT)
 
-
-
 shinyServer(function(input, output) {
   
-diseases <- data.frame(fromJSON(getURL(URLencode('skipper.cs.utexas.edu:5001/rest/native/?query="select * from Infectious_Diseases"'),httpheader=c(DB='jdbc:oracle:thin:@sayonara.microlab.cs.utexas.edu:1521:orcl', USER='C##cs329e_jnw653', PASS='orcl_jnw653', MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON'), verbose = TRUE), ))  
+diseases <- data.frame(fromJSON(getURL(URLencode('skipper.cs.utexas.edu:5001/rest/native/?query="select * from Infectious_Diseases"'),httpheader=c(DB='jdbc:oracle:thin:@sayonara.microlab.cs.utexas.edu:1521:orcl', USER='C##cs329e_jnw653', PASS='orcl_jnw653', MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON'), verbose = TRUE) ))  
 
-  KPI_Very_Low_value <- reactive({input$KPI1})     
-  KPI_Low_value <- reactive({input$KPI2})
-  KPI_Medium_value <- reactive({input$KPI3})
+  KPI_Very_Low_Value <- reactive({input$KPI1})     
+  KPI_Low_Value <- reactive({input$KPI2})
+  KPI_Medium_Value <- reactive({input$KPI3})
   rv <- reactiveValues(alpha = 0.50)
   observeEvent(input$light, { rv$alpha <- 0.50 })
   observeEvent(input$dark, { rv$alpha <- 0.75 })
   
-df1 <- diseases %>% group_by(SEX, COUNTY) %>% summarize(avg_count = mean(COUNT)) %>% mutate(kpi = avg_count) %>% mutate(kpi = ifelse(kpi <= KPI_Very_Low_value, 'Very Low', ifelse(kpi <= KPI_Low_value, 'Low', ifelse(kpi <= KPI_Medium_value, 'Medium', 'High'))))
+df1 <- diseases %>% group_by(SEX, COUNTY) %>% summarize(avg_count = mean(COUNT)) %>% mutate(kpi = avg_count) %>% mutate(kpi = ifelse(kpi <= KPI_Very_Low_Value, 'Very Low', ifelse(kpi <= KPI_Low_Value, 'Low', ifelse(kpi <= KPI_Medium_Value, 'Medium', 'High'))))
   
   output$distPlot1 <- renderPlot({             
     plot <- ggplot() + 
@@ -55,7 +53,7 @@ df1 <- diseases %>% group_by(SEX, COUNTY) %>% summarize(avg_count = mean(COUNT))
             position=position_identity()
       ) + theme(axis.text.y = element_text(face = "plain", size = 8))
       
-    return(plot)
+    plot
   })
 })
   
