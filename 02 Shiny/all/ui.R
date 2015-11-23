@@ -22,7 +22,10 @@ navbarPage(
            )
   ),
   tabPanel(title = "Barchart",
-           mainPanel(plotOutput("distPlotchl")
+           mainPanel(plotOutput("distPlotchl"),
+                     plotOutput("distPlotgon"),
+                     plotOutput("distPlotcam")
+                     
            )
   ),
   tabPanel(title = "Scatterplots",

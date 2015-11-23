@@ -35,8 +35,7 @@ dashboardPage(
       
       # Second tab content
       tabItem(tabName = "barchart",
-              actionButton(inputId = "clicks2",  label = "Click me"),
-              plotOutput("distPlot2")
+              plotOutput("distPlotchl")
       ),
       
       # Third tab content
