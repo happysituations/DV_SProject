@@ -34,7 +34,7 @@ shinyServer(function(input, output) {
   })
   
   output$distPlot1 <- renderPlot({             
-    plot <- ggplot() + 
+    plot1 <- ggplot() + 
       coord_cartesian() + 
       scale_x_discrete() +
       scale_y_discrete() +
@@ -56,7 +56,7 @@ shinyServer(function(input, output) {
             geom_params=list(alpha=rv$alpha), 
             position=position_identity()
       )
-    plot
+    plot1
   }) 
   
   observeEvent(input$clicks, {
@@ -65,7 +65,7 @@ shinyServer(function(input, output) {
   
   # Begin code for Second Tab:
   
-  df <- eventReactive(input$clicks2, {data.frame(fromJSON(getURL(URLencode(gsub("\n", " ", 'skipper.cs.utexas.edu:5001/rest/native/?query=
+  dfMF <- data.frame(fromJSON(getURL(URLencode(gsub("\n", " ", 'skipper.cs.utexas.edu:5001/rest/native/?query=
                                                                                  "select YEAR, DISEASE, sum_COUNT, sum(sum_COUNT) 
                                                                                OVER (PARTITION BY DISEASE) as window_avg_COUNT
                                                                                  from 
@@ -76,7 +76,7 @@ shinyServer(function(input, output) {
                                                                                  order by DISEASE;"
                                                                                  ')), httpheader=c(DB='jdbc:oracle:thin:@sayonara.microlab.cs.utexas.edu:1521:orcl', USER='C##cs329e_hys82', PASS='orcl_hys82', 
                                                                                                    MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON'), verbose = TRUE)))
-  })
+
   
   dfMale <- data.frame(fromJSON(getURL(URLencode(gsub("\n", " ", 'skipper.cs.utexas.edu:5001/rest/native/?query=
                                                                                  "select YEAR, DISEASE, sum_COUNT, sum(sum_COUNT) 
@@ -92,13 +92,13 @@ shinyServer(function(input, output) {
 
   
   output$distPlot2 <- renderPlot(height=300, width=700, {
-    plot1 <- ggplot() + 
+    plot2 <- ggplot() + 
       coord_cartesian() + 
       scale_x_continuous() +
       scale_y_continuous() +
       labs(title='AMEBIASIS AVERAGE_COUNT, WINDOW_AVG_COUNT') +
       labs(x=paste("YEAR"), y=paste("COUNT OVER ALL COUNTIES PER YEAR")) +
-      layer(data=df, 
+      layer(data=dfMF, 
             mapping=aes(x=YEAR, y=SUM_COUNT), 
             stat="identity", 
             stat_params=list(), 
@@ -114,12 +114,12 @@ shinyServer(function(input, output) {
             geom_params=list(fill="BLUE"), 
             position=position_identity()
       ) + coord_flip() +
-      layer(data=df, 
+      layer(data=dfMF, 
             mapping=aes(yintercept = WINDOW_AVG_COUNT/14), 
             geom="hline",
             geom_params=list(colour="BLACK")
       ) +
-      layer(data=df, 
+      layer(data=dfMF, 
             mapping=aes(x=2000, y=round(WINDOW_AVG_COUNT/14), label=round(WINDOW_AVG_COUNT/14)), 
             stat="identity", 
             stat_params=list(), 
@@ -129,7 +129,7 @@ shinyServer(function(input, output) {
       )
     
       
-    plot1
+    plot2
   })
   
   # Begin code for Third Tab:
