@@ -11,13 +11,9 @@ require(leaflet)
 shinyServer(function(input, output) {
   
   KPI_Very_Low_Value = 0     
-  KPI_Low_Value = 10
-  KPI_Medium_Value = 100  
-  
-  #KPI_Very_Low_Value <- reactive({input$KPI1})     
-  #KPI_Low_Value <- reactive({input$KPI2})
-  #KPI_Medium_Value <- reactive({input$KPI3})
-  
+  KPI_Low_Value = 5
+  KPI_Medium_Value = 50 
+
   diseases <- data.frame(fromJSON(getURL(URLencode(gsub("\n", " ", 'skipper.cs.utexas.edu:5001/rest/native/?query=
                                                         "select * from Infectious_Diseases;"')), httpheader=c(DB='jdbc:oracle:thin:@sayonara.microlab.cs.utexas.edu:1521:orcl', USER='C##cs329e_jnw653', PASS='orcl_jnw653', MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON'), verbose = TRUE)))
   
@@ -189,7 +185,7 @@ from (select YEAR, DISEASE, sum(COUNT) as sum_COUNT
                                                      ')), httpheader=c(DB='jdbc:oracle:thin:@sayonara.microlab.cs.utexas.edu:1521:orcl', USER='C##cs329e_hys82', PASS='orcl_hys82', MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON'), verbose = TRUE)))
   
   
-  dfMalechl <- data.frame(fromJSON(getURL(URLencode(gsub("\n", " ", 'skipper.cs.utexas.edu:5001/rest/native/?query="select YEAR, DISEASE, sum_COUNT, sum(sum_COUNT) 
+  dfMalecam <- data.frame(fromJSON(getURL(URLencode(gsub("\n", " ", 'skipper.cs.utexas.edu:5001/rest/native/?query="select YEAR, DISEASE, sum_COUNT, sum(sum_COUNT) 
                                                          OVER (PARTITION BY DISEASE) as window_avg_COUNT
                                                          from (select YEAR, DISEASE, sum(COUNT) as sum_COUNT
                                                          from Infectious_Diseases
