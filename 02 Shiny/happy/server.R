@@ -91,13 +91,13 @@ shinyServer(function(input, output) {
                                                                                                    MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON'), verbose = TRUE)))
 
   
-  output$distPlot2 <- renderPlot(height=1000, width=4000, {
+  output$distPlot2 <- renderPlot(height=300, width=700, {
     plot1 <- ggplot() + 
       coord_cartesian() + 
       scale_x_continuous() +
       scale_y_continuous() +
       labs(title='AMEBIASIS AVERAGE_COUNT, WINDOW_AVG_COUNT') +
-      labs(x=paste("YEAR"), y=paste("COUNT OVER ALL COUTIES PER YEAR")) +
+      labs(x=paste("YEAR"), y=paste("COUNT OVER ALL COUNTIES PER YEAR")) +
       layer(data=df, 
             mapping=aes(x=YEAR, y=SUM_COUNT), 
             stat="identity", 
