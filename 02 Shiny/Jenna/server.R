@@ -9,6 +9,10 @@ require(leaflet)
 require(DT)
 
 shinyServer(function(input, output) {
+
+  KPI_Very_Low_Value = 0     
+  KPI_Low_Value = 10
+  KPI_Medium_Value = 100  
   
   #KPI_Very_Low_Value <- reactive({input$KPI1})     
   #KPI_Low_Value <- reactive({input$KPI2})
@@ -18,8 +22,8 @@ shinyServer(function(input, output) {
 "select * from Infectious_Diseases;"')), httpheader=c(DB='jdbc:oracle:thin:@sayonara.microlab.cs.utexas.edu:1521:orcl', USER='C##cs329e_jnw653', PASS='orcl_jnw653', MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON'), verbose = TRUE)))
  
   
-df1 <- diseases %>% group_by(SEX, COUNTY) %>% summarize(avg_count = mean(COUNT)) %>% mutate(kpi = avg_count)# %>% mutate(kpi = ifelse(kpi <= KPI_Very_Low_Value, 'Very Low', ifelse(kpi <= KPI_Low_Value, 'Low', ifelse(kpi <= KPI_Medium_Value, 'Medium', 'High'))))
-  
+df1 <- diseases %>% group_by(SEX, COUNTY) %>% summarize(avg_count = mean(COUNT)) %>% mutate(kpi = avg_count) %>% mutate(kpi = ifelse(kpi <= KPI_Very_Low_Value, 'Very Low', ifelse(kpi <= KPI_Low_Value, 'Low', ifelse(kpi <= KPI_Medium_Value, 'Medium', 'High'))))
+
   
   output$distPlot1 <- renderPlot({             
     plot <- ggplot() + 
