@@ -68,8 +68,204 @@ img {
 </div>
 
 
-<p>html from last project to help recreate the project (with improvements):</p>
-<p>link to shiny application:</p>
+<div id="link-to-git-repo-from-last-project-to-help-recreate-the-project-with-improvements" class="section level3">
+<h3>Link to git repo from last project to help recreate the project (with improvements):</h3>
+<p><a href="https://github.com/jennawebb117/DV_TProject1" class="uri">https://github.com/jennawebb117/DV_TProject1</a></p>
+<p>The shiny application takes a couple of minutes to load due to many the many dataframes being used, and the large dataset we chose to use. For the barchart, the top three diseases have been chosen to reduce the amount of time it takes to load.</p>
+</div>
+<div id="link-to-shiny-application" class="section level3">
+<h3>link to shiny application:</h3>
+</div>
+<div id="code-for-server.r" class="section level3">
+<h3>Code for server.R:</h3>
+<pre><code># server.R
+require(&quot;jsonlite&quot;)
+require(&quot;RCurl&quot;)
+require(ggplot2)
+require(dplyr)
+require(shiny)
+require(shinydashboard)
+require(leaflet)
+
+
+shinyServer(function(input, output) {
+  
+  KPI_Very_Low_Value = 0     
+  KPI_Low_Value = 10
+  KPI_Medium_Value = 100  
+  
+  #KPI_Very_Low_Value &lt;- reactive({input$KPI1})     
+  #KPI_Low_Value &lt;- reactive({input$KPI2})
+  #KPI_Medium_Value &lt;- reactive({input$KPI3})
+  
+  diseases &lt;- data.frame(fromJSON(getURL(URLencode(gsub(&quot;\n&quot;, &quot; &quot;, 'skipper.cs.utexas.edu:5001/rest/native/?query=
+                                                        &quot;select * from Infectious_Diseases;&quot;')), httpheader=c(DB='jdbc:oracle:thin:@sayonara.microlab.cs.utexas.edu:1521:orcl', USER='C##cs329e_jnw653', PASS='orcl_jnw653', MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON'), verbose = TRUE)))
+  
+  
+  df1 &lt;- diseases %&gt;% group_by(SEX, COUNTY) %&gt;% summarize(avg_count = mean(COUNT)) %&gt;% mutate(kpi = avg_count) %&gt;% mutate(kpi = ifelse(kpi &lt;= KPI_Very_Low_Value, 'Very Low', ifelse(kpi &lt;= KPI_Low_Value, 'Low', ifelse(kpi &lt;= KPI_Medium_Value, 'Medium', 'High'))))
+  
+  
+  output$distPlot1 &lt;- renderPlot({             
+    plot &lt;- ggplot() + 
+      coord_cartesian() + 
+      scale_x_discrete() +
+      scale_y_discrete() +
+      labs(title='Number of Diseases per Sex per County') +
+      labs(x=paste(&quot;SEX&quot;), y=paste(&quot;County&quot;)) +
+      layer(data=df1, 
+            mapping=aes(x=SEX, y=COUNTY, label=round(avg_count, 2)),
+            stat=&quot;identity&quot;, 
+            stat_params=list(), 
+            geom=&quot;text&quot;,
+            geom_params=list(colour=&quot;black&quot;, size = 3), 
+            position=position_identity()
+      ) +
+      layer(data=df1, 
+            mapping=aes(x=SEX, y=COUNTY, label=round(avg_count, 2)),
+            stat=&quot;identity&quot;, 
+            stat_params=list(), 
+            geom=&quot;text&quot;,
+            geom_params=list(colour=&quot;black&quot;, vjust=4, hjust=-1, size = 3), 
+            position=position_identity()
+      ) +
+      layer(data=df1, 
+            mapping=aes(x=SEX, y=COUNTY, fill=kpi), 
+            stat=&quot;identity&quot;, 
+            stat_params=list(), 
+            geom=&quot;tile&quot;,
+            geom_params=list(alpha=0.50), 
+            position=position_identity()
+      ) + theme(axis.text.y = element_text(face = &quot;plain&quot;, size = 8))
+    
+    plot
+  })
+
+  
+  
+  # Begin code for Second Tab:
+  
+  dfchl &lt;- data.frame(fromJSON(getURL(URLencode(gsub(&quot;\n&quot;, &quot; &quot;, 'skipper.cs.utexas.edu:5001/rest/native/?query=&quot;select YEAR, DISEASE, sum_COUNT, sum(sum_COUNT)                         OVER (PARTITION BY DISEASE) as window_avg_COUNT
+from (select YEAR, DISEASE, sum(COUNT) as sum_COUNT
+from Infectious_Diseases
+where DISEASE = (\'Chlamydia\') and (SEX=(\'Male\') OR SEX=(\'Female\') )
+group by YEAR, DISEASE)
+order by DISEASE;&quot;
+')), httpheader=c(DB='jdbc:oracle:thin:@sayonara.microlab.cs.utexas.edu:1521:orcl', USER='C##cs329e_hys82', PASS='orcl_hys82', MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON'), verbose = TRUE)))
+  
+  
+  dfMalechl &lt;- data.frame(fromJSON(getURL(URLencode(gsub(&quot;\n&quot;, &quot; &quot;, 'skipper.cs.utexas.edu:5001/rest/native/?query=&quot;select YEAR, DISEASE, sum_COUNT, sum(sum_COUNT) 
+OVER (PARTITION BY DISEASE) as window_avg_COUNT
+from (select YEAR, DISEASE, sum(COUNT) as sum_COUNT
+from Infectious_Diseases
+where DISEASE = (\'Chlamydia\') and SEX=(\'Male\')
+group by YEAR, DISEASE)
+order by DISEASE;&quot;
+')), httpheader=c(DB='jdbc:oracle:thin:@sayonara.microlab.cs.utexas.edu:1521:orcl', USER='C##cs329e_hys82', PASS='orcl_hys82', MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON'), verbose = TRUE)))
+  
+  
+  output$distPlotchl &lt;- renderPlot(height=300, width=700, {
+    plotchl &lt;- ggplot() + 
+      coord_cartesian() + 
+      scale_x_continuous() +
+      scale_y_continuous() +
+      labs(title='CHLAMYDIA AVERAGE_COUNT, WINDOW_AVG_COUNT') +
+      labs(x=paste(&quot;YEAR&quot;), y=paste(&quot;COUNT OVER ALL COUNTIES PER YEAR&quot;)) +
+      layer(data=dfchl, 
+            mapping=aes(x=YEAR, y=SUM_COUNT), 
+            stat=&quot;identity&quot;, 
+            stat_params=list(), 
+            geom=&quot;bar&quot;,
+            geom_params=list(fill=&quot;RED&quot;), 
+            position=position_identity()
+      ) + coord_flip() +
+      layer(data=dfMalechl, 
+            mapping=aes(x=YEAR, y=SUM_COUNT), 
+            stat=&quot;identity&quot;, 
+            stat_params=list(), 
+            geom=&quot;bar&quot;,
+            geom_params=list(fill=&quot;BLUE&quot;), 
+            position=position_identity()
+      ) + coord_flip() +
+      layer(data=dfchl, 
+            mapping=aes(yintercept = WINDOW_AVG_COUNT/14), 
+            geom=&quot;hline&quot;,
+            geom_params=list(colour=&quot;BLACK&quot;)
+      ) +
+      layer(data=dfchl, 
+            mapping=aes(x=2000, y=round(WINDOW_AVG_COUNT/14), label=round(WINDOW_AVG_COUNT/14)), 
+            stat=&quot;identity&quot;, 
+            stat_params=list(), 
+            geom=&quot;text&quot;,
+            geom_params=list(colour=&quot;black&quot;, hjust=-.1), 
+            position=position_identity()
+      )
+    plotchl
+  })
+  
+  # Begin code for Third Tab:
+  
+  df &lt;- data.frame(fromJSON(getURL(URLencode('skipper.cs.utexas.edu:5001/rest/native/?query=&quot;select * from Infectious_Diseases where COUNTY NOT IN (\'California\')&quot;'),httpheader=c(DB='jdbc:oracle:thin:@sayonara.microlab.cs.utexas.edu:1521:orcl', USER='C##cs329e_cmm5627', PASS='orcl_cmm5627', MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON'), verbose = TRUE) ))
+  Male_df &lt;- df %&gt;% select(SEX, mean(COUNT), YEAR) %&gt;% filter(SEX == &quot;Male&quot;)
+  Female_df &lt;- df %&gt;% select(SEX, mean(COUNT), YEAR) %&gt;% filter(SEX == &quot;Female&quot;)
+  
+  output$distPlot2 &lt;- renderPlot({
+    
+    plot1 &lt;- df %&gt;% select(SEX, mean(COUNT), YEAR) %&gt;% ggplot(aes(y = mean(COUNT), x = YEAR, color = &quot;TOTAL&quot;)) + ggtitle(&quot;Average Count of Infectious Diseases by Sex (TOTAL)&quot;) + geom_point() + scale_y_continuous() + scale_x_continuous() + coord_cartesian() 
+    return(plot1)
+  }) 
+  
+  output$distPlot3 &lt;- renderPlot({
+    
+    plot2 &lt;- Male_df %&gt;% select(SEX, mean(COUNT), YEAR) %&gt;% ggplot(aes(y = mean(COUNT), x = YEAR, color = &quot;Male&quot;)) + ggtitle(&quot;Average Count of Infectious Diseases by Sex (MALE)&quot;) + geom_point() + scale_y_continuous() + scale_x_continuous() + coord_cartesian()
+    return(plot2)
+  }) 
+  
+  output$distPlot4 &lt;- renderPlot({
+    
+    plot3 &lt;- Female_df &lt;- Female_df %&gt;% select(SEX, mean(COUNT), YEAR) %&gt;% ggplot(aes(y = mean(COUNT), x = YEAR, color = &quot;Female&quot;)) + ggtitle(&quot;Average Count of Infectious Diseases by Sex (FEMALE)&quot;) + geom_point() + scale_y_continuous() + scale_x_continuous() + coord_cartesian() 
+    return(plot3)
+  })
+  
+})
+</code></pre>
+</div>
+<div id="code-for-ui.r" class="section level3">
+<h3>Code for ui.R:</h3>
+<pre><code>#ui.R 
+
+library(shiny)
+
+navbarPage(
+  title = &quot;Project 6&quot;,
+  tabPanel(title = &quot;Crosstab&quot;,
+           sidebarPanel(
+             sliderInput(&quot;KPI1&quot;, &quot;KPI_Very_Low_Value:&quot;, 
+                        min = -10, max = 0,  value = 0),
+             sliderInput(&quot;KPI2&quot;, &quot;KPI_Low_Value:&quot;, 
+                         min = 0, max = 10,  value = 5),
+             sliderInput(&quot;KP32&quot;, &quot;KPI_Medium_Value:&quot;, 
+                         min = 10, max = 100,  value = 50),
+             textInput(inputId = &quot;title&quot;, 
+                       label = &quot;Crosstab Title&quot;,
+                       value = &quot;Number of Diseases per Sex per County&quot;),
+             actionButton(inputId = &quot;clicks1&quot;,  label = &quot;Click me&quot;)
+           ),
+           
+           mainPanel(plotOutput(&quot;distPlot1&quot;)
+           )
+  ),
+  tabPanel(title = &quot;Barchart&quot;,
+           mainPanel(plotOutput(&quot;distPlotchl&quot;)
+           )
+  ),
+  tabPanel(title = &quot;Scatterplots&quot;,
+           mainPanel(plotOutput(&quot;distPlot2&quot;),
+                    plotOutput(&quot;distPlot3&quot;),
+                    plotOutput(&quot;distPlot4&quot;)
+           )        
+  )
+)</code></pre>
+</div>
 
 
 </div>
