@@ -8,7 +8,7 @@ output: html_document
 ###Link to git repo from last project to help recreate the project (with improvements):
 https://github.com/jennawebb117/DV_TProject1  
 
-The shiny application takes a couple of minutes to load due to many the many dataframes being used, and the large dataset we chose to use. For the barchart, the top three diseases have been chosen to reduce the amount of time it takes to load.  
+The shiny application takes a couple of minutes to load due to many the many dataframes being used, and the large dataset we chose to use. For the barchart, the top disease has been chosen to reduce the amount of time it takes to load.  
   
 ###link to shiny application:
 
