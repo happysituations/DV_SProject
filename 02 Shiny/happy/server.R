@@ -65,7 +65,7 @@ shinyServer(function(input, output) {
   
   # Begin code for Second Tab:
   
-  dfMF <- eventReactive(input$clicks2, {data.frame(fromJSON(getURL(URLencode(gsub("\n", " ", 'skipper.cs.utexas.edu:5001/rest/native/?query=
+  df <- eventReactive(input$clicks2, {data.frame(fromJSON(getURL(URLencode(gsub("\n", " ", 'skipper.cs.utexas.edu:5001/rest/native/?query=
                                                                                  "select YEAR, DISEASE, sum_COUNT, sum(sum_COUNT) 
                                                                                OVER (PARTITION BY DISEASE) as window_avg_COUNT
                                                                                  from 
