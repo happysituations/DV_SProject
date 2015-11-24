@@ -8,9 +8,21 @@ output: html_document
 ###Link to git repo from last project to help recreate the project (with improvements):
 https://github.com/jennawebb117/DV_TProject1  
 
-The shiny application takes a couple of minutes to load due to many the many dataframes being used, and the large dataset we chose to use. For the barchart, the top disease has been chosen to reduce the amount of time it takes to load.  
+The shiny application takes a couple of minutes to load due to many the many dataframes being used, and the large dataset we chose to use. For the barchart, the top disease has been chosen to reduce the amount of time it takes to load.   
   
-###link to shiny application:
+###Link to shiny application:
+####This link is to the shortened version, so that there is a lesser chance of connection errors
+https://jennawebb117.shinyapps.io/Project6  
+
+####This link is to the full version, which takes a long time to load  
+https://happysituations.shinyapps.io/project6shinyapp  
+
+If the application does not load, here are the screenshots of the full version:  
+![](../02 Shiny/crosstab.png)  
+![](../02 Shiny/chl.png)  
+![](../02 Shiny/gonandcam.png)  
+![](../02 Shiny/scatterall.png)  
+![](../02 Shiny/mf.png)  
 
 ###Code for server.R:  
 ```
